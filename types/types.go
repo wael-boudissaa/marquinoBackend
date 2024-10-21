@@ -5,14 +5,18 @@ type UserStore interface {
 	GetUserById(user User) (*User, error)
 	CreateUser(user User, token string, hashedPassword string) error
 }
+
+type CategorieStore interface {
+	GetCategories() (*[]Categorie, error)
+}
 type CommandeStore interface {
 	GetAllCommandes() (*[]Commande, error)
 	GetCommandeById(id string) (*Commande, error)
-	CreateCommande(idCommande, idCustomer string) error
+	CreateCommande(idCommande, idCustomer string, price int) error
 	// UpdateCommande(commande Commande) error
 	// DeleteCommande(commande Commande) error
 	// GetCommandeByUser(idUser string) (*[]Commande, error)
-	InsertProductINCommande(product Product, idCommande string) (*CommandeProduct, error)
+	InsertProductINCommande(product ProductBought, idCommande string) (*CommandeProduct, error)
 }
 
 type CommandeProduct struct {
@@ -32,6 +36,7 @@ type User struct {
 	Id           string `json:"idProfile"`
 	FirstName    string `json:"firstName"`
 	LastName     string `json:"lastName"`
+	Type         string `json:"type"`
 	Email        string `json:"email"`
 	Address      string `json:"adress"`
 	Phone        string `json:"phone"`
@@ -65,18 +70,32 @@ type ProductStore interface {
 }
 
 type Product struct {
-	IdProduct   string `json:"idProduct"`
-	NameProduct string `json:"nameProduct"`
-	Price       string `json:"price"`
-	Description string `json:"description"`
-	IdCategorie string `json:"idCategorie"`
+	IdProduct      string `json:"idProduct"`
+	NameProduct    string `json:"nameProduct"`
+	Price          int    `json:"price"`
+	Description    string `json:"description"`
+	IdCategorie    string `json:"idCategorie"`
+	Stock          int    `json:"stock"`
+	CreatedAt      string `json:"createdAt"`
+	DateExpiration string `json:"dateExpiration"`
+	Boosted        bool   `json:"boosted"`
 }
 
 type ProductCreate struct {
+	NameProduct    string `json:"nameProduct"`
+	Price          string `json:"price"`
+	Description    string `json:"description"`
+	IdCategorie    string `json:"idCategorie"`
+	Stock          string `json:"stock"`
+	DateExpiration string `json:"dateExpiration"`
+	Boosted        string `json:"boosted"`
+}
+type ProductBought struct {
+	IdProduct   string `json:"idProduct"`
 	NameProduct string `json:"nameProduct"`
-	Price       string `json:"price"`
-	Description string `json:"description"`
+	Price       int    `json:"price"`
 	IdCategorie string `json:"idCategorie"`
+	Quantity    int    `json:"quantity"`
 }
 
 type Categorie struct {

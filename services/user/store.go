@@ -51,8 +51,8 @@ func (s *Store) GetUserById(user types.User) (*types.User, error) {
 }
 
 func (s *Store) CreateUser(user types.User, token string, hashedPassword string) error {
-	query := `INSERT INTO profile (idProfile, firstName, lastName, email, password, addresse,createdAt,lastLogin,refreshToken) VALUES (?,  ?, ?, ?,?,?,?,?,?)`
-	rows, err := s.db.Query(query, user.Id, user.FirstName, user.LastName, user.Email, hashedPassword, user.Address, user.CreatedAt, user.LastLogin, token)
+	query := `INSERT INTO profile (idProfile, firstName, lastName, email, password, addresse,createdAt,lastLogin,refreshToken,type) VALUES (?,  ?, ?, ?,?,?,?,?,?)`
+	rows, err := s.db.Query(query, user.Id, user.FirstName, user.LastName, user.Email, hashedPassword, user.Address, user.CreatedAt, user.LastLogin, token, user.Type)
 	if err != nil {
 		return fmt.Errorf("error creating user: %v", err)
 	}
@@ -70,6 +70,8 @@ func scanRowsIntoUser(rows *sql.Rows) (*types.User, error) {
 		&user.Password,
 		&user.Address,
 		&user.Phone,
+		&user.CreatedAt,
+		&user.Type,
 		&user.LastLogin,
 		&user.Refreshtoken,
 	)

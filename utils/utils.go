@@ -7,6 +7,7 @@ import (
 )
 
 func ParseJson(r *http.Request, v any) error {
+
 	if r.Body == nil {
 		return fmt.Errorf("request body is empty")
 	}

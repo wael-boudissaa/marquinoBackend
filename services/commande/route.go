@@ -34,7 +34,7 @@ func (h *Handler) getAllCommandes(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) CreateCommande(w http.ResponseWriter, r *http.Request) {
 	var idCustomer = mux.Vars(r)["id"]
-	var products []types.Product
+	var products []types.ProductBought
 	err := utils.ParseJsonList(r, &products)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error parsing JSON: %v", err))
@@ -45,8 +45,12 @@ func (h *Handler) CreateCommande(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("Error while creating commande id"))
 		return
 	}
+	var price int
+	for _, product := range products {
+		price += product.Price
+	}
 
-	err = h.s.CreateCommande(idCommande, idCustomer)
+	err = h.s.CreateCommande(idCommande, idCustomer, price)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("Error while  ddd creating commande"))
 		return

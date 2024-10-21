@@ -46,13 +46,13 @@ func (s *Store) GetCommandeById(id string) (*Commande, error) {
 	return commande, nil
 }
 
-func (s *Store) CreateCommande(idCommande, idCustomer string) error {
+func (s *Store) CreateCommande(idCommande, idCustomer string, price int) error {
 	if s.db == nil {
 		return fmt.Errorf("database connection is nil")
 	}
 
-	query := `INSERT INTO commande (idCommande, idCustomer) VALUES (?, ?)`
-	result, err := s.db.Exec(query, idCommande, idCustomer)
+	query := `INSERT INTO commande (idCommande, idCustomer, price,createdAt ) VALUES (?, ?, ?,now()) )`
+	result, err := s.db.Exec(query, idCommande, idCustomer, price)
 	if err != nil {
 		fmt.Printf("Error executing query: %v\n", err)
 		return err
@@ -63,16 +63,15 @@ func (s *Store) CreateCommande(idCommande, idCustomer string) error {
 		fmt.Printf("Error getting rows affected: %v\n", err)
 		return err
 	}
-
 	fmt.Printf("Rows affected: %d\n", rowsAffected)
 	return nil
 }
 
-func (s *Store) InsertProductINCommande(product types.Product, idCommande string) (*types.CommandeProduct, error) {
-	query := `INSERT INTO commande_products (idCommande, idProduct) VALUES (?, ?)`
+func (s *Store) InsertProductINCommande(product types.ProductBought, quantity int, idCommande string) (*types.CommandeProduct, error) {
+	query := `INSERT INTO commande_products (idCommande, idProduct, quantity) VALUES (?, ?, ?)`
 
 	// Execute the insert query
-	result, err := s.db.Exec(query, idCommande, product.IdProduct)
+	result, err := s.db.Exec(query, idCommande, product.IdProduct, product.Quantity)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %w", err)
 	}

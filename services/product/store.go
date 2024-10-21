@@ -51,8 +51,8 @@ func (h *Store) GetAllProducts() (*[]types.Product, error) {
 }
 
 func (h *Store) CreateProduct(product types.ProductCreate, idProduct string) error {
-	query := `INSERT INTO product (idProduct, nameProduct, price, description, idCategorie) VALUES (?,  ?, ?, ?,?)`
-	rows, err := h.db.Query(query, idProduct, product.NameProduct, product.Price, product.Description, product.IdCategorie)
+	query := `INSERT INTO product (idProduct, nameProduct, price, description, idCategorie,boosted,stock,dateExpiration,createdAt) VALUES (?,  ?, ?, ?,?,?,?,?,now())`
+	rows, err := h.db.Query(query, idProduct, product.NameProduct, product.Price, product.Description, product.IdCategorie, product.Boosted, product.Stock, product.DateExpiration)
 	if err != nil {
 		return err
 	}
