@@ -104,3 +104,13 @@ type Categorie struct {
 	IdCategorie   string `json:"idCategorie"`
 	NameCategorie string `json:"nameCategorie"`
 }
+type FeedBack struct {
+	IDCustomer string `json:"idCustomer"`
+	IDFeedBack string `json:"idFeedback"`
+	Comment    string `json:"comment"`
+	CreatedAt  string `json:"createdAt"`
+}
+type FeedBackStore interface {
+	GetAllFeedBack() (*FeedBack, error)
+	CreateFeedBack(idFeedBack, idCustomer, comment string) error
+}
