@@ -57,7 +57,7 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetAllProduct(w http.ResponseWriter, r *http.Request) {
 	products, err := h.store.GetAllProducts()
 	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("Error while getting products"))
+		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 	utils.WriteJson(w, http.StatusOK, products)

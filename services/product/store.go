@@ -37,17 +37,35 @@ func (h *Store) GetAllProducts() (*[]types.Product, error) {
 	if err != nil {
 		return nil, err
 	}
-	products := new([]types.Product)
-	product := new(types.Product)
+	defer rows.Close() // Ensure rows are closed when done
+
+	var products []types.Product // Initialize as an empty slice
+
 	for rows.Next() {
-		err := rows.Scan(&product.IdProduct, &product.NameProduct, &product.Price, &product.Description, &product.IdCategorie)
+		var product types.Product // Create a new instance for each row
+		err := rows.Scan(
+			&product.IdProduct,
+			&product.NameProduct,
+			&product.Price,
+			&product.Description,
+			&product.IdCategorie,
+			&product.Stock,
+			&product.CreatedAt,
+			&product.DateExpiration, // Now scans correctly into time.Time
+			&product.Boosted)
 
 		if err != nil {
-			return nil, err
+			return nil, err // Return immediately on error
 		}
-		*products = append(*products, *product)
+		products = append(products, product) // Append the new product instance
 	}
-	return products, nil
+
+	// Check for errors during iteration
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &products, nil // Return the address of the slice
 }
 
 func (h *Store) CreateProduct(product types.ProductCreate, idProduct string) error {
@@ -83,7 +101,7 @@ func (h *Store) GetProductByCategorie(idCategorie string) (*[]types.Product, err
 	products := new([]types.Product)
 	product := new(types.Product)
 	for rows.Next() {
-		err := rows.Scan(&product.IdProduct, &product.NameProduct, &product.Price, &product.Description, &product.IdCategorie)
+		err := rows.Scan(&product.IdProduct, &product.NameProduct, &product.Price, &product.Description, &product.IdCategorie, &product.Stock, &product.DateExpiration, &product.Boosted, &product.CreatedAt)
 
 		if err != nil {
 			return nil, err
@@ -96,7 +114,7 @@ func (h *Store) GetProductByCategorie(idCategorie string) (*[]types.Product, err
 func (s *Store) scanRowsIntoProduct(rows *sql.Rows) (*types.Product, error) {
 	product := new(types.Product)
 	for rows.Next() {
-		err := rows.Scan(&product.IdProduct, &product.NameProduct, &product.Price, &product.Description, &product.IdCategorie)
+		err := rows.Scan(&product.IdProduct, &product.NameProduct, &product.Price, &product.Description, &product.IdCategorie, &product.Stock, &product.DateExpiration, &product.Boosted, &product.CreatedAt)
 		if err != nil {
 			return nil, err
 		}

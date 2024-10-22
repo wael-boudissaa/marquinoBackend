@@ -67,7 +67,7 @@ func (s *Store) CreateCommande(idCommande, idCustomer string, price int) error {
 	return nil
 }
 
-func (s *Store) InsertProductINCommande(product types.ProductBought, quantity int, idCommande string) (*types.CommandeProduct, error) {
+func (s *Store) InsertProductINCommande(product types.ProductBought, idCommande string) (*types.CommandeProduct, error) {
 	query := `INSERT INTO commande_products (idCommande, idProduct, quantity) VALUES (?, ?, ?)`
 
 	// Execute the insert query

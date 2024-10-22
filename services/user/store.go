@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/wael-boudissaa/marquinoBackend/services/auth"
 	"github.com/wael-boudissaa/marquinoBackend/types"
 )
 
@@ -50,16 +51,26 @@ func (s *Store) GetUserById(user types.User) (*types.User, error) {
 	return u, nil
 }
 
-func (s *Store) CreateUser(user types.User, token string, hashedPassword string) error {
-	query := `INSERT INTO profile (idProfile, firstName, lastName, email, password, addresse,createdAt,lastLogin,refreshToken,type) VALUES (?,  ?, ?, ?,?,?,?,?,?)`
-	rows, err := s.db.Query(query, user.Id, user.FirstName, user.LastName, user.Email, hashedPassword, user.Address, user.CreatedAt, user.LastLogin, token, user.Type)
+func (s *Store) CreateUser(user types.User, idUser string, token string, hashedPassword string) error {
+	query := `INSERT INTO profile (idProfile, firstName, lastName, email, password, address, createdAt, lastLogin, refreshToken, type)
+			  VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)`
+
+	_, err := s.db.Exec(query, idUser, user.FirstName, user.LastName, user.Email, hashedPassword, user.Address, token, user.Type)
 	if err != nil {
 		return fmt.Errorf("error creating user: %v", err)
 	}
-	defer rows.Close()
+	queryCustomer := `INSERT into customer(idCustomer, idProfile) values(?, ?)`
+	idCustomer, err := auth.CreateAnId()
+	if err != nil {
+		return fmt.Errorf("error creating user: %v", err)
+	}
+	_, err = s.db.Exec(queryCustomer, idCustomer, idUser)
+	if err != nil {
+		return fmt.Errorf("error creating user: %v", err)
+	}
+
 	return nil
 }
-
 func scanRowsIntoUser(rows *sql.Rows) (*types.User, error) {
 	user := new(types.User)
 	err := rows.Scan(
@@ -69,6 +80,7 @@ func scanRowsIntoUser(rows *sql.Rows) (*types.User, error) {
 		&user.Email,
 		&user.Password,
 		&user.Address,
+
 		&user.Phone,
 		&user.CreatedAt,
 		&user.Type,
