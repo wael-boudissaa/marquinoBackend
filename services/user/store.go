@@ -17,20 +17,33 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) GetUserByEmail(user types.UserLogin) (*types.User, error) {
-	query := `Select * from profile where email = ? `
+	query := `SELECT idProfile, firstName, lastName, email, password, address, createdAt, type, lastLogin, refreshToken FROM profile WHERE email = ?`
 	rows, err := s.db.Query(query, user.Email)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close() // Ensure rows are closed to avoid memory leaks
+
 	u := new(types.User)
 	for rows.Next() {
-		u, err = scanRowsIntoUser(rows)
+		err = rows.Scan(
+			&u.Id,
+			&u.FirstName,
+			&u.LastName,
+			&u.Email,
+			&u.Password,
+			&u.Address,
+			&u.CreatedAt,
+			&u.Type,
+			&u.LastLogin,
+			&u.Refreshtoken,
+		)
 		if err != nil {
 			return nil, err
 		}
 	}
 	if u.Id == "" {
-		return nil, fmt.Errorf("user not found ")
+		return nil, fmt.Errorf("user not found")
 	}
 	return u, nil
 }

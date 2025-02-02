@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -35,15 +36,25 @@ func (h *Handler) loginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
+	body, err := io.ReadAll(r.Body)
+    if err != nil {
+        utils.WriteError(w, http.StatusBadRequest, err)
+        return
+    }
+	fmt.Println("Received JSON:", string(body))
+
 	u, err := h.store.GetUserByEmail(user)
 
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
+    
+    fmt.Println("user found ")
 
 	if !auth.ComparePasswords([]byte(user.Password), []byte(u.Password)) {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Password"))
+		utils.WriteError(w, http.StatusConflict, fmt.Errorf("Invalid Password"))
 		return
 	}
 
